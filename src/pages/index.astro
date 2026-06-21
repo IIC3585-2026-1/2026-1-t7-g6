@@ -1,11 +1,40 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+let cryptos = [];
+try {
+  const response = await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=25");
+  cryptos = await response.json();
+	console.log("Datos obtenidos de la API:", cryptos);
+} catch (error) {
+  console.error("Error obteniendo datos de la API:", error);
+}
 ---
 
 <Layout>
-	<Welcome />
+	<Header />
+	<main class="container mx-auto px-4 py-8 grow">
+    
+    <section class="mb-10 text-center">
+      <h2 class="text-3xl font-extrabold text-slate-800 mb-2">Monitoreo del Mercado</h2>
+      <p class="text-slate-600">Datos base generados estáticamente. Selecciona una moneda para ver tiempo real.</p>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <aside class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <h3 class="text-lg font-semibold mb-4 border-b pb-2">Configuración</h3>
+				<!-- TODO: Agregar componente de configuración -->
+      </aside>
+
+      <section class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 min-h-100">
+        <h3 class="text-lg font-semibold mb-4 border-b pb-2">Gráfico en Tiempo Real</h3>
+				<!-- TODO: Agregar componente de gráfico -->
+      </section>
+
+    </div>
+  </main>
+	<Footer />
 </Layout>
