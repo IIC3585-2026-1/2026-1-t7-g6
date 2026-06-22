@@ -3,12 +3,36 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/astro/Header.astro';
 import Footer from '../components/astro/Footer.astro';
 import CryptoFilter from '../components/vue/CryptoFilter.vue';
+import RealtimeCrypto from '../components/svelte/RealtimeCrypto.svelte';
 
-let cryptos = [];
+const fallbackCryptos = [
+  { id: 'bitcoin', name: 'Bitcoin', symbol: 'btc' },
+  { id: 'ethereum', name: 'Ethereum', symbol: 'eth' },
+  { id: 'solana', name: 'Solana', symbol: 'sol' },
+];
+
+let cryptos = fallbackCryptos;
 try {
   const response = await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=25");
-  cryptos = await response.json();
-	console.log("Datos obtenidos de la API:", cryptos);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(`CoinGecko respondió con estado ${response.status}`);
+  }
+
+  if (!Array.isArray(data)) {
+    throw new Error("CoinGecko no devolvió una lista de criptomonedas");
+  }
+
+  const validCryptos = data.filter(
+    (crypto) => crypto?.id && crypto?.name && crypto?.symbol,
+  );
+
+  if (validCryptos.length === 0) {
+    throw new Error("CoinGecko devolvió una lista vacía");
+  }
+
+  cryptos = validCryptos;
 } catch (error) {
   console.error("Error obteniendo datos de la API:", error);
 }
@@ -32,7 +56,10 @@ try {
 
       <section class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 min-h-100">
         <h3 class="text-lg font-semibold mb-4 border-b pb-2">Gráfico en Tiempo Real</h3>
-				<!-- TODO: Agregar componente de gráfico -->
+				<RealtimeCrypto
+					client:visible
+					initialCoin={cryptos[0]?.id ?? 'bitcoin'}
+				/>
       </section>
 
     </div>

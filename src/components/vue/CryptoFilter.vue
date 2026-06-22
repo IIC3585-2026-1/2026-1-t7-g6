@@ -20,6 +20,7 @@ const currentCryptoData = computed(() => {
 const notifySelection = () => {
   if (!selectedCrypto.value) return;
 
+  window.__selectedCrypto = selectedCrypto.value;
   const event = new CustomEvent("crypto-changed", {
     detail: { coin: selectedCrypto.value },
   });
@@ -53,7 +54,7 @@ onMounted(() => {
           :key="crypto.id"
           :value="crypto.id"
         >
-          {{ crypto.name }} ({{ crypto.symbol.toUpperCase() }})
+          {{ crypto.name ?? crypto.id }} ({{ crypto.symbol?.toUpperCase() ?? "N/A" }})
         </option>
       </select>
     </div>
@@ -64,6 +65,7 @@ onMounted(() => {
     >
       <div class="flex items-center space-x-2">
         <img
+          v-if="currentCryptoData.image"
           :src="currentCryptoData.image"
           :alt="currentCryptoData.name"
           class="w-6 h-6 rounded-full"
@@ -75,13 +77,13 @@ onMounted(() => {
       <p class="text-slate-500 mt-2">
         Precio Base (USD):
         <span class="text-slate-800 font-semibold"
-          >${{ currentCryptoData.current_price.toLocaleString() }}</span
+          >${{ currentCryptoData.current_price?.toLocaleString() ?? "No disponible" }}</span
         >
       </p>
       <p class="text-slate-500">
         Cap. de Mercado:
         <span class="text-slate-800 font-semibold"
-          >${{ currentCryptoData.market_cap.toLocaleString() }}</span
+          >${{ currentCryptoData.market_cap?.toLocaleString() ?? "No disponible" }}</span
         >
       </p>
     </div>
